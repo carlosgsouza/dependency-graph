@@ -9,7 +9,7 @@ class DependencyGraphServiceSpec extends Specification {
 	def setup() {
 		service = new DependencyGraphService()
 		service.parser = Mock(DependencyGraphParser)
-		service.printer = Mock(DependencyGraphParser)
+		service.printer = Mock(DependencyGraphPrinter)
 	}
 	
 	def "should parse input file, create a dependency graph, and print it"() {

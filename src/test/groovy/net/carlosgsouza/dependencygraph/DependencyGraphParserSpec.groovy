@@ -1,8 +1,7 @@
 package net.carlosgsouza.dependencygraph
 
-import java.io.File.TempDirectory;
-
-import spock.lang.Specification;
+import spock.lang.Specification
+import spock.lang.Unroll
 
 class DependencyGraphParserSpec extends Specification {
 
@@ -17,6 +16,22 @@ class DependencyGraphParserSpec extends Specification {
 	
 	def cleanup() {
 		cleanTempFolder()
+	}
+	
+	@Unroll
+	def "should fail when the given file path #description"() {
+		when:
+		parser.parse(filePath)
+		
+		then:
+		thrown Exception
+		
+		where: 
+		filePath				| description
+		null					| "is null"
+		""						| "is empty"
+		"inexistent/file.txt"	| "points to inexistent file"
+		"src/test/resources/"	| "points to a directory"
 	}
 	
 	def "should parse an input file and create a dependency graph"() {
@@ -35,14 +50,15 @@ B->D
 		dependencyGraph.dependencies["B"] == ["C", "D"]
 	}
 	
-	def "should ignore white spaces"() {
+	def "should ignore white spaces and invalid lines"() {
 		given:
 		File inputFile = new File(tempFolder, "input.txt")
 		inputFile << """
 			
 		A->B
 A	->	C
-
+D->E->F
+this is an invalid line
 
 """
 		when:
@@ -69,10 +85,11 @@ A	->	C
 		DependencyGraph dependencyGraph = parser.parse(inputFile.absolutePath)
 		
 		then:
-		dependencyGraph.rootNodes == ["#", "@"]
+		dependencyGraph.rootNodes.containsAll(["#", "@"])
+		dependencyGraph.rootNodes.size() == 2
 		
 		and:
-		dependencyGraph.dependencies["A"] == ["á"]
+		dependencyGraph.dependencies["#"] == ["á"]
 		dependencyGraph.dependencies["@"] == ["ç"]
 	}
 	

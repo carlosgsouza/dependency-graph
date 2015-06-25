@@ -37,7 +37,8 @@ class DependencyGraphSpec extends Specification {
 		dependencyGraph.addDependency('G', 'H')
 		
 		then: "all nodes that don't with no other depending nodes are considering root nodes" 
-		dependencyGraph.rootNodes == ["A", "D", "F", "G"]
+		dependencyGraph.rootNodes.containsAll(["A", "D", "F", "G"])
+		dependencyGraph.rootNodes.size() == 4
 	}
 	
 	def "should ignore duplicate dependencies"() {
@@ -109,5 +110,26 @@ class DependencyGraphSpec extends Specification {
 		dependencyGraph.dependencies["a.b.c"] == ["#"]
 		dependencyGraph.dependencies["#"] == ["éã"]
 	}
+	
+	def "should provide a toString() implementation"() {
+		when:
+		dependencyGraph.addDependency('A', 'B')
+		dependencyGraph.addDependency('B', 'C')
+		
+		then:
+		dependencyGraph.toString() == dependencyGraph.dependencies.toString()
+	}
+	
+	def "should consider the first node as a root node even if there are other nodes which depend on it"() {
+		when:
+		dependencyGraph.addDependency("A", "B")
+		dependencyGraph.addDependency("B", "A")
+		dependencyGraph.addDependency("C", "D")
+		
+		then: "the first root node is the first node, even through there are nodes which depend on it"
+		dependencyGraph.rootNodes == ["A", "C"]
+	}
+	
+	
 	
 }
