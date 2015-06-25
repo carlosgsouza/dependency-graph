@@ -37,7 +37,7 @@ class DependencyGraphSpec extends Specification {
 		dependencyGraph.addDependency('G', 'H')
 		
 		then: "all nodes that don't with no other depending nodes are considering root nodes" 
-		dependencyGraph.rootNodes == ["A", "D", "G"]
+		dependencyGraph.rootNodes == ["A", "D", "F", "G"]
 	}
 	
 	def "should ignore duplicate dependencies"() {
