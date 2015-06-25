@@ -44,6 +44,12 @@ tasks.withType(Test) {
 	reports.html.destination = file("${reporting.baseDir}/${name}")
 }
 
+test {
+	testLogging {
+		exceptionFormat "full"
+	}
+}
+
 task wrapper(type:Wrapper) {
 	gradleVersion="2.3"
 }
