@@ -31,9 +31,6 @@ B->D
 		DependencyGraph dependencyGraph = parser.parse(inputFile.absolutePath)
 		
 		then:
-		dependencyGraph.root == "A"
-		
-		and:
 		dependencyGraph.dependencies["A"] == ["B", "C"]
 		dependencyGraph.dependencies["B"] == ["C", "D"]
 	}
@@ -52,7 +49,7 @@ A	->	C
 		DependencyGraph dependencyGraph = parser.parse(inputFile.absolutePath)
 		
 		then:
-		dependencyGraph.root == "A"
+		dependencyGraph.rootNodes == ["A"]
 		
 		and:
 		dependencyGraph.dependencies["A"] == ["B", "C"]
@@ -72,7 +69,7 @@ A	->	C
 		DependencyGraph dependencyGraph = parser.parse(inputFile.absolutePath)
 		
 		then:
-		dependencyGraph.root == "#"
+		dependencyGraph.rootNodes == ["#", "@"]
 		
 		and:
 		dependencyGraph.dependencies["A"] == ["á"]

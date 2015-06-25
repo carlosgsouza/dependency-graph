@@ -12,7 +12,6 @@ class DependencyGraphSpec extends Specification {
 	
 	def "should build an empty dependency graph"() {
 		expect: 
-		dependencyGraph.root == null
 		dependencyGraph.dependencies == [:]
 	}
 	
@@ -21,12 +20,24 @@ class DependencyGraphSpec extends Specification {
 		dependencyGraph.addDependency('A', 'B')
 		dependencyGraph.addDependency('B', 'C')
 		
-		then: "the root is the first node"
-		dependencyGraph.root == "A"
-		
-		and: "dependencies can be retrieved for a given node"
+		then: 
 		dependencyGraph.dependencies["A"] == ["B"]
 		dependencyGraph.dependencies["B"] == ["C"]
+		
+		and:
+		dependencyGraph.rootNodes == ["A"]
+	}
+	
+	def "should create a dependency graph with multiple root nodes"() {
+		when: 
+		dependencyGraph.addDependency('A', 'B')
+		dependencyGraph.addDependency('B', 'C')
+		dependencyGraph.addDependency('D', 'E')
+		dependencyGraph.addDependency('F', 'E')
+		dependencyGraph.addDependency('G', 'H')
+		
+		then: "all nodes that don't with no other depending nodes are considering root nodes" 
+		dependencyGraph.rootNodes == ["A", "D", "G"]
 	}
 	
 	def "should ignore duplicate dependencies"() {
@@ -59,7 +70,7 @@ class DependencyGraphSpec extends Specification {
 		dependencyGraph.dependencies["C"] == ["A"]
 	}
 	
-	def "should add unreachable nodes without complaining"() {
+	def "should add new 'root' nodes"() {
 		given:
 		dependencyGraph.addDependency("A", "B")
 		dependencyGraph.addDependency("B", "C")

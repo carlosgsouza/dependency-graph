@@ -139,6 +139,7 @@ class DependencyGraphPrinterSpec extends Specification {
 |   	 |_ F
 |	     |  |_ H
 |	     |     |_ L
+|	     |        |_ 
 |		 |_ G
 |		 |_ J
 |			|_ I
@@ -148,7 +149,10 @@ class DependencyGraphPrinterSpec extends Specification {
 |   		   |_ P
 |			   |  |_ Q
 |			   |_ L
-|				  |_ I (!)
+|			   |  |_ I (!)
+|              |_ K
+|                 |_ N
+|                 |_ L
 |_ J
    |_ I
       |_ O
@@ -158,13 +162,12 @@ class DependencyGraphPrinterSpec extends Specification {
       |  |_ Q
       |_ L
    	  |_ I (!)
-
 (!) Circular Dependency
-
-Unmatched Dependencies: 
-K->N
-K->L
 """
+	}
+	
+	def "should print dependency graphs with multiple 'roots'"() {
+		
 	}
 }
 
