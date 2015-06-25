@@ -1,6 +1,15 @@
 plugins {
 	id "groovy"
 	id "eclipse"
+	id "application"
+	id "jacoco"
+}
+
+mainClassName = 'net.carlosgsouza.dependencygraph.DependencyGraphService'
+
+configurations {
+	integrationTestCompile.extendsFrom testCompile
+	integrationTestRuntime.extendsFrom testRuntime
 }
 
 repositories {
@@ -13,6 +22,26 @@ dependencies {
 	testCompile "org.spockframework:spock-core:1.0-groovy-2.3"
 	testCompile "cglib:cglib-nodep:2.2.2"
 	testCompile "org.objenesis:objenesis:1.2"
+}
+
+sourceSets {
+	integrationTest {
+		groovy {
+			compileClasspath += main.output + test.output
+			runtimeClasspath += main.output + test.output
+			srcDir file("src/integrationTest/groovy")
+		}
+	}
+}
+
+task integrationTest(type:Test, dependsOn:"installApp") {
+	testClassesDir = sourceSets.integrationTest.output.classesDir
+	classpath = sourceSets.integrationTest.runtimeClasspath
+	outputs.upToDateWhen{ false }
+}
+
+tasks.withType(Test) {
+	reports.html.destination = file("${reporting.baseDir}/${name}")
 }
 
 task wrapper(type:Wrapper) {
