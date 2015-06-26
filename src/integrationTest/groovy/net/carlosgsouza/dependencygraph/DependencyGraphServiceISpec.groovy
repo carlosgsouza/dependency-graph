@@ -6,10 +6,10 @@ class DependencyGraphServiceISpec extends Specification {
 
 	def "should run the command line application"() {
 		when:
-		Process process = " ./build/install/dependency-graph/bin/dependency-graph.bat src/test/resources/input2.txt".execute()
+		Process process = "./build/install/dependency-graph/bin/dependency-graph src/test/resources/input2.txt".execute()
 		
 		then:
-		process.text == """"A
+		process.text == """A
 |_ B
 |  |_ C
 |  |  |_ E
