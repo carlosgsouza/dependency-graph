@@ -10,6 +10,9 @@ mainClassName = 'net.carlosgsouza.dependencygraph.DependencyGraphService'
 configurations {
 	integrationTestCompile.extendsFrom testCompile
 	integrationTestRuntime.extendsFrom testRuntime
+	
+	performanceTestCompile.extendsFrom testCompile
+	performanceTestRuntime.extendsFrom testRuntime
 }
 
 repositories {
@@ -32,6 +35,14 @@ sourceSets {
 			srcDir file("src/integrationTest/groovy")
 		}
 	}
+	
+	performanceTest {
+		groovy {
+			compileClasspath += main.output + test.output
+			runtimeClasspath += main.output + test.output
+			srcDir file('src/performanceTest/groovy')
+		}
+	}
 }
 
 task integrationTest(type:Test, dependsOn:"installApp") {
@@ -40,6 +51,13 @@ task integrationTest(type:Test, dependsOn:"installApp") {
 	outputs.upToDateWhen{ false }
 }
 check.dependsOn integrationTest
+
+task performanceTest(type:Test) {
+	testClassesDir = sourceSets.performanceTest.output.classesDir
+	classpath = sourceSets.performanceTest.runtimeClasspath
+	outputs.upToDateWhen{ false }
+}
+check.dependsOn performanceTest
 
 tasks.withType(Test) {
 	reports.html.destination = file("${reporting.baseDir}/${name}")
