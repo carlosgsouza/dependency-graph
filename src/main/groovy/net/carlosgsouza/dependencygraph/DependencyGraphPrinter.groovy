@@ -43,7 +43,6 @@ class DependencyGraphPrinter {
 	private printChild(String child, String prefix, String appendedPrefix, DependencyGraph dependencyGraph, Map<String, Boolean> isAncestor, MutableBoolean circularDependencyFound) {
 		boolean circularDependency = isAncestor[child]
 		
-		
 		out.println("$prefix|_ $child" + (circularDependency ? " (!)" : ""))
 		
 		if(!circularDependency) {

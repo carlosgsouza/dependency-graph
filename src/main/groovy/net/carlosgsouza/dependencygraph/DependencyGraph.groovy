@@ -7,7 +7,7 @@ class DependencyGraph {
 	String firstNode
 	
 	public DependencyGraph() {
-		this.dependencies = new HashMap<String, Set<String>>()
+		this.dependencies = new TreeMap<String, Set<String>>()
 		this.firstNode = null
 	}
 	
@@ -35,7 +35,7 @@ class DependencyGraph {
 			result.add(0, firstNode)
 		}
 		
-		return result
+		return result 
 	}
 	
 	@Override
