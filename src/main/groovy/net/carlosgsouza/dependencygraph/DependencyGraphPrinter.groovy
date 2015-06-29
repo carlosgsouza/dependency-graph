@@ -9,13 +9,9 @@ class DependencyGraphPrinter {
 			throw new IllegalArgumentException("dependencyGraph is required")
 		}
 		
-		Map<String, Boolean> isAncestor = [:]
-		
 		LinkedList<NodeJob> S = new LinkedList<NodeJob>()
-		
-		// Allows us to pass a parameter by "reference" in Java
-		// We don't use a field for this since that would make this routine thread-unsafe 
-		MutableBoolean circularDependencyFound = new MutableBoolean(false)
+		Map<String, Boolean> isAncestor = [:]
+		boolean circularDependencyFound = false
 		
 		dependencyGraph.rootNodes.each { node ->
 			out.println node
@@ -36,7 +32,7 @@ class DependencyGraphPrinter {
 						
 						createJobsForChildren(S, dependencyGraph, job.node, job.childrenPrefix)
 					} else {
-						circularDependencyFound.value = true
+						circularDependencyFound = true
 					}
 					
 					out.println job.prefix + "|_ " + job.node + (circularDependency ? " (!)" : "")
@@ -48,7 +44,7 @@ class DependencyGraphPrinter {
 			isAncestor[node] = false
 		}
 		
-		if(circularDependencyFound.value == true) {
+		if(circularDependencyFound == true) {
 			out.println("\n(!) Circular Dependency")
 		}
 	}

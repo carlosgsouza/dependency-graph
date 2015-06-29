@@ -5,3 +5,4 @@ build/
 .projectbin
 .project
 bin
+gradle.properties
