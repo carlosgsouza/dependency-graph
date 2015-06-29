@@ -11,54 +11,75 @@ class DependencyGraphPrinter {
 		
 		Map<String, Boolean> isAncestor = [:]
 		
+		LinkedList<NodeJob> S = new LinkedList<NodeJob>()
+		
 		// Allows us to pass a parameter by "reference" in Java
 		// We don't use a field for this since that would make this routine thread-unsafe 
 		MutableBoolean circularDependencyFound = new MutableBoolean(false)
 		
-		dependencyGraph.rootNodes.each { root ->
-			out.println(root)
+		dependencyGraph.rootNodes.each { node ->
+			out.println node
 			
-			isAncestor[root] = true
-			printChildren("", root, dependencyGraph, isAncestor, circularDependencyFound)
-			isAncestor[root] = false
+			isAncestor[node] = true
+			createJobsForChildren(S, dependencyGraph, node, "")
+			
+			while(S.isEmpty() == false) {
+				NodeJob job = S.removeLast()
+				
+				if(job.printed == false) {				
+					boolean circularDependency = isAncestor[job.node]
+					
+					if(!circularDependency) {
+						job.printed = true
+						S << job
+						isAncestor[job.node] = true
+						
+						createJobsForChildren(S, dependencyGraph, job.node, job.childrenPrefix)
+					} else {
+						circularDependencyFound.value = true
+					}
+					
+					out.println job.prefix + "|_ " + job.node + (circularDependency ? " (!)" : "")
+				} else {
+					isAncestor[job.node] = false
+				}
+			}
+			
+			isAncestor[node] = false
 		}
 		
 		if(circularDependencyFound.value == true) {
 			out.println("\n(!) Circular Dependency")
 		}
 	}
-	
-	private printChildren(String prefix, String node, DependencyGraph dependencyGraph, Map<String, Boolean> isAncestor, MutableBoolean circularDependencyFound) {
-		int childrenCount = dependencyGraph.dependencies[node]?.size() ?: 0
-		if(childrenCount == 0) {
-			return
+
+	private createJobsForChildren(LinkedList S, DependencyGraph dependencyGraph, String node, String prefix) {
+		if(dependencyGraph.dependencies[node]) {
+			S << new NodeJob(printed:false, node:dependencyGraph.dependencies[node][-1], prefix:prefix, childrenPrefix:prefix+"   ")
+
+			for(int i = dependencyGraph.dependencies[node].size()-2; i >= 0; i--) {
+				S << new NodeJob(printed:false, node:dependencyGraph.dependencies[node][i], prefix:prefix, childrenPrefix:prefix+"|  ")
+			}
 		}
-		
-		(childrenCount-1).times { i ->
-			printChild(dependencyGraph.dependencies[node][i], prefix, "|  ", dependencyGraph, isAncestor, circularDependencyFound)
-		}
-		printChild(dependencyGraph.dependencies[node][-1], prefix, "   ", dependencyGraph, isAncestor, circularDependencyFound)
 	}
-	
-	private printChild(String child, String prefix, String appendedPrefix, DependencyGraph dependencyGraph, Map<String, Boolean> isAncestor, MutableBoolean circularDependencyFound) {
-		boolean circularDependency = isAncestor[child]
 		
-		out.println("$prefix|_ $child" + (circularDependency ? " (!)" : ""))
-		
-		if(!circularDependency) {
-			isAncestor[child] = true
-			printChildren(prefix + appendedPrefix, child, dependencyGraph, isAncestor, circularDependencyFound)
-			isAncestor[child] = false
-		} 
-		
-		circularDependencyFound.value = circularDependencyFound.value | circularDependency
-	}
-	
 	static class MutableBoolean {
 		boolean value
 		
 		public MutableBoolean(boolean value) {
 			this.value = value
+		}
+	}
+	
+	static class NodeJob {
+		boolean printed = false
+		String node
+		
+		String childrenPrefix
+		String prefix
+		
+		public String toString() {
+			node + (printed ? "*" : "")
 		}
 	}
 }

@@ -22,11 +22,11 @@ class DependencyGraphPrinterPSpec extends Specification {
 		printer.out = new PrintStream(output)
 	}
 	
-	@Timeout(10)
+	@Timeout(600)
 	def "should be able to print a dependency graph with a huge depth"() {
 		given:
-		println "Generating dependency graph with height=100k"
-		100000.times {
+		println "Generating dependency graph with height=10k"
+		10000.times {
 			dependencyGraph.addDependency("$it", "${it+1}")
 		}
 		
